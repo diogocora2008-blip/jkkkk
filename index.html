@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dicionário de Dados - KF Imports</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body data-bs-theme="light">
+
+    <!-- Topbar -->
+    <nav class="navbar navbar-expand-lg px-4 shadow-sm fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold text-primary" href="#">
+                <i class="fa-solid fa-database me-2"></i>KF Imports | Dicionário de Dados
+            </a>
+            <div class="d-flex align-items-center gap-3">
+                <button id="themeToggle" class="btn btn-outline-secondary btn-sm" title="Alternar Tema">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid" style="margin-top: 80px;">
+        <div class="row">
+            <!-- Sidebar Esquerda -->
+            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar collapse p-3 shadow-sm">
+                <div class="position-sticky">
+                    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
+                        <span>Tabelas do Banco</span>
+                    </h6>
+                    <ul class="nav flex-column flex-grow-1 overflow-auto" style="max-height: calc(100vh - 150px);" id="tableNavList">
+                        <li class="nav-item"><a class="nav-link" href="#usuario">usuario</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#cliente">cliente</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#categoria">categoria</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#fornecedor">fornecedor</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#produto">produto</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#endereco">endereco</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#consentimento_cliente">consentimento_cliente</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#aparelho">aparelho</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#aparelho_imei">aparelho_imei</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#solicitacao_titular">solicitacao_titular</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#compra">compra</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#item_compra">item_compra</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#caixa">caixa</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#mov_caixa">mov_caixa</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#venda">venda</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#item_venda">item_venda</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#ordem_servico">ordem_servico</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#item_os">item_os</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#mov_estoque">mov_estoque</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#pagamento">pagamento</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#estorno">estorno</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#log_auditoria">log_auditoria</a></li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Área Principal -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+                
+                <!-- Painel de Identificação -->
+                <div class="card mb-4 shadow-sm border-0">
+                    <div class="card-body">
+                        <h2 class="h4 text-primary fw-bold">Sistema de Gestão Operacional, Vendas e Assistência Técnica</h2>
+                        <p class="mb-2"><strong>Escopo:</strong> Controle centralizado de ordem de serviço, estoque, frente de caixa e conformidade com LGPD para loja física em São Paulo.</p>
+                        <p class="mb-2"><strong>Tecnologia:</strong> MySQL 8.4 LTS (InnoDB, utf8mb4)</p>
+                        <p class="mb-3"><strong>Responsáveis:</strong> Grupo 2D1 - Ciência da Computação (Data Stewards & Data Owners)</p>
+                        
+                        <div class="d-flex flex-wrap gap-2">
+                            <a href="docs/Especificacao_Requisitos_Regras_Negocio_BD.pdf" class="btn btn-primary btn-sm" target="_blank">
+                                <i class="fa-solid fa-file-pdf me-1"></i> Baixar Especificação de Requisitos (PDF)
+                            </a>
+                            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#derModal">
+                                <i class="fa-solid fa-network-wired me-1"></i> Visualizar DER (Diagrama)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Barra de Pesquisa Real-Time -->
+                <div class="input-group mb-4 shadow-sm">
+                    <span class="input-group-text bg-white"><i class="fa-solid fa-search text-muted"></i></span>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Pesquise por nome de tabela, coluna ou descrição...">
+                </div>
+
+                <!-- Container do Dicionário (100% das Tabelas) -->
+                <div id="dictionaryContainer">
+
+                    <!-- TABELA 1: usuario -->
+                    <section id="usuario" class="card mb-4 shadow-sm border-0 table-section">
+                        <div class="card-header bg-primary text-white fw-bold">Tabela: usuario</div>
+                        <div class="card-body">
+                            <p class="text-muted">Armazena os operadores do sistema, credenciais de acesso, perfis de autorização (RBAC) e controle de bloqueio por falhas de login.</p>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Atributo</th>
+                                            <th>Descrição / Regra de Negócio</th>
+                                            <th>Tipo e Tamanho</th>
+                                            <th>Constraints</th>
+                                            <th>Privacidade</th>
+                                            <th>Linhagem</th>
+                                            <th>Acesso (RBAC)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><code>id_usuario</code></td>
+                                            <td>Identificador único sequencial do usuário.</td>
+                                            <td>INT</td>
+                                            <td><strong>[PK]</strong>, NOT NULL, AUTO_INCREMENT</td>
+                                            <td><span class="badge badge-na">[N/A]</span></td>
+                                            <td>Origem interna do sistema.</td>
+                                            <td>Administrador, Gerente, Técnico, Atendente</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>nome</code></td>
+                                            <td>Nome completo do colaborador.</td>
+                                            <td>VARCHAR(100)</td>
+                                            <td>NOT NULL</td>
+                                            <td><span class="badge badge-dp">[DP]</span></td>
+                                            <td>Cadastro inicial de RH.</td>
+                                            <td>Administrador, Gerente</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>login</code></td>
+                                            <td>Identificação de login única no sistema.</td>
+                                            <td>VARCHAR(50)</td>
+                                            <td><strong>[UK]</strong>, NOT NULL</td>
+                                            <td><span class="badge badge-na">[N/A]</span></td>
+                                            <td>Definido pelo Administrador.</td>
+                                            <td>Administrador</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>senha_hash</code></td>
+                                            <td>Hash criptográfico da senha utilizando Argon2id (RNF01 e RNF09).</td>
+                                            <td>VARCHAR(255)</td>
+                                            <td>NOT NULL</td>
+                                            <td><span class="badge badge-dps">[DPS]</span></td>
+                                            <td>Gerado no cadastro/alteração de senha.</td>
+                                            <td>Sistema (Backend)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>perfil</code></td>
+                                            <td>Perfil de acesso do usuário (ATENDENTE, TECNICO, GERENTE, ADMINISTRADOR).</td>
+                                            <td>ENUM</td>
+                                            <td>NOT NULL</td>
+                                            <td><span class="badge badge-na">[N/A]</span></td>
+                                            <td>Atribuído via Matriz RBAC.</td>
+                                            <td>Administrador</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>ativo</code></td>
+                                            <td>Status de atividade do usuário para exclusão lógica (RN10). 1=Ativo, 0=Inativo.</td>
+                                            <td>TINYINT(1)</td>
+                                            <td>NOT NULL, DEFAULT 1</td>
+                                            <td><span class="badge badge-na">[N/A]</span></td>
+                                            <td>Controle operacional.</td>
+                                            <td>Administrador</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>tentativas_login</code></td>
+                                            <td>Contador de tentativas falhas consecutivas. Bloqueio automático após 5 falhas (RF14).</td>
+                                            <td>TINYINT</td>
+                                            <td>NOT NULL, DEFAULT 0</td>
+                                            <td><span class="badge badge-na">[N/A]</span></td>
+                                            <td>Mecanismo de autenticação.</td>
+                                            <td>Sistema (Backend)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>data_bloqueio_ate</code></td>
+                                            <td>Data e hora limite de bloqueio temporário (NOW + 15 min após 5 falhas).</td>
+                                            <td>DATETIME</td>
+                                            <td>NULL</td>
+                                            <td><span class="badge badge-na">[N/A]</span></td>
+                                            <td>Controle de segurança.</td>
+                                            <td>Sistema (Backend)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>data_cadastro</code></td>
+                                            <td>Data e hora da criação do registro do usuário.</td>
+                                            <td>DATETIME</td>
+                                            <td>NOT NULL, DEFAULT CURRENT_TIMESTAMP</td>
+                                            <td><span class="badge badge-na">[N/A]</span></td>
+                                            <td>Automático SGBD.</td>
+                                            <td>Leitura geral</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- TABELA 2: cliente -->
+                    <section id="cliente" class="card mb-4 shadow-sm border-0 table-section">
+                        <div class="card-header bg-primary text-white fw-bold">Tabela: cliente</div>
+                        <div class="card-body">
+                            <p class="text-muted">Armazena os dados cadastrais dos clientes atendidos na loja física, contemplando requisitos da LGPD (anonimização).</p>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Atributo</th>
+                                            <th>Descrição / Regra de Negócio</th>
+                                            <th>Tipo e Tamanho</th>
+                                            <th>Constraints</th>
+                                            <th>Privacidade</th>
+                                            <th>Linhagem</th>
+                                            <th>Acesso (RBAC)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><code>id_cliente</code></td>
+                                            <td>Identificador único do cliente.</td>
+                                            <td>INT</td>
+                                            <td><strong>[PK]</strong>, NOT NULL, AUTO_INCREMENT</td>
+                                            <td><span class="badge badge-na">[N/A]</span></td>
+                                            <td>Balcão de atendimento.</td>
+                                            <td>Atendente, Gerente, Administrador</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>nome</code></td>
+                                            <td>Nome completo do cliente. Recebe 'ANONIMIZADO' na rotina de anonimização.</td>
+                                            <td>VARCHAR(100)</td>
+                                            <td>NOT NULL</td>
+                                            <td><span class="badge badge-dp">[DP]</span></td>
+                                            <td>Informado pelo titular.</td>
+                                            <td>Atendente, Gerente, Administrador</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>cpf_cnpj</code></td>
+                                            <td>Documento CPF ou CNPJ do cliente. Único quando preenchido. Validado (RF01).</td>
+                                            <td>VARCHAR(14)</td>
+                                            <td><strong>[UK]</strong>, NULL</td>
+                                            <td><span class="badge badge-dps">[DPS]</span></td>
+                                            <td>Informado pelo titular.</td>
+                                            <td>Atendente, Gerente, Administrador</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>whatsapp</code></td>
+                                            <td>Número de WhatsApp para contato e envio de links de acompanhamento. Somente dígitos com DDI.</td>
+                                            <td>VARCHAR(13)</td>
+                                            <td>NULL</td>
+                                            <td><span class="badge badge-dp">[DP]</span></td>
+                                            <td>Informado pelo titular.</td>
+                                            <td>Atendente, Gerente, Administrador</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>email</code></td>
+                                            <td>Endereço de e-mail opcional do cliente (RF01).</td>
+                                            <td>VARCHAR(100)</td>
+                                            <td>NULL</td>
+                                            <td><span class="badge badge-dp">[DP]</span></td>
+                                            <td>Informado pelo titular.</td>
+                                            <td>Atendente, Gerente, Administrador</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>ativo</code></td>
+                                            <td>Indica se o cliente está ativo na base (1=Sim, 0=Inativo - RN06).</td>
+                                            <td>TINYINT(1)</td>
+                                            <td>NOT NULL, DEFAULT 1</td>
+                                            <td><span class="badge badge-na">[N/A]</span></td>
+                                            <td>Gestão cadastral.</td>
+                                            <td>Atendente, Gerente, Administrador</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>anonimizado</code></td>
+                                            <td>Indica se os dados pessoais foram anonimizados por requisição LGPD (0=Não, 1=Sim).</td>
+                                            <td>TINYINT(1)</td>
+                                            <td>NOT NULL, DEFAULT 0, CHECK (anonimizado = 0 OR ativo = 0)</td>
+                                            <td><span class="badge badge-na">[N/A]</span></td>
+                                            <td>Procedure <code>sp_anonimizar_cliente</code>.</td>
+                                            <td>Gerente, Administrador</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>data_cadastro</code></td>
+                                            <td>Data e hora do cadastro inicial do cliente.</td>
+                                            <td>DATETIME</td>
+                                            <td>NOT NULL, DEFAULT CURRENT_TIMESTAMP</td>
+                                            <td><span class="badge badge-na">[N/A]</span></td>
+                                            <td>Automático SGBD.</td>
+                                            <td>Leitura geral</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>data_anonimizacao</code></td>
+                                            <td>Data e hora em que a anonimização foi executada (RF16).</td>
+                                            <td>DATETIME</td>
+                                            <td>NULL</td>
+                                            <td><span class="badge badge-na">[N/A]</span></td>
+                                            <td>Procedure <code>sp_anonimizar_cliente</code>.</td>
+                                            <td>Gerente, Administrador</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- TABELA 3: categoria -->
+                    <section id="categoria" class="card mb-4 shadow-sm border-0 table-section">
+                        <div class="card-header bg-primary text-white fw-bold">Tabela: categoria</div>
+                        <div class="card-body">
+                            <p class="text-muted">Agrupamento lógico para produtos, acessórios e peças de reposição comercializadas ou aplicadas.</p>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Atributo</th>
+                                            <th>Descrição / Regra de Negócio</th>
+                                            <th>Tipo e Tamanho</th>
+                                            <th>Constraints</th>
+                                            <th>Privacidade</th>
+                                            <th>Linhagem</th>
+                                            <th>Acesso (RBAC)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><code>id_categoria</code></td><td>Identificador único da categoria.</td><td>INT</td><td><strong>[PK]</strong>, NOT NULL, AUTO_INCREMENT</td><td><span class="badge badge-na">[N/A]</span></td><td>Gestão de catálogo.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>nome</code></td><td>Nome descritivo da categoria. Deve ser único.</td><td>VARCHAR(60)</td><td><strong>[UK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Gestão de catálogo.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>ativo</code></td><td>Status da categoria (1=Ativo, 0=Inativo).</td><td>TINYINT(1)</td><td>NOT NULL, DEFAULT 1</td><td><span class="badge badge-na">[N/A]</span></td><td>Gestão de catálogo.</td><td>Gerente, Administrador</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- TABELA 4: fornecedor -->
+                    <section id="fornecedor" class="card mb-4 shadow-sm border-0 table-section">
+                        <div class="card-header bg-primary text-white fw-bold">Tabela: fornecedor</div>
+                        <div class="card-body">
+                            <p class="text-muted">Cadastro de fornecedores e atacadistas parceiros, especialmente focados nas compras presenciais realizadas no Brás.</p>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Atributo</th>
+                                            <th>Descrição / Regra de Negócio</th>
+                                            <th>Tipo e Tamanho</th>
+                                            <th>Constraints</th>
+                                            <th>Privacidade</th>
+                                            <th>Linhagem</th>
+                                            <th>Acesso (RBAC)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><code>id_fornecedor</code></td><td>Identificador único do fornecedor.</td><td>INT</td><td><strong>[PK]</strong>, NOT NULL, AUTO_INCREMENT</td><td><span class="badge badge-na">[N/A]</span></td><td>Cadastro comercial.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>nome</code></td><td>Razão social ou nome fantasia do fornecedor.</td><td>VARCHAR(100)</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Cadastro comercial.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>cnpj</code></td><td>CNPJ do fornecedor. Opcional, porém único quando preenchido.</td><td>CHAR(14)</td><td><strong>[UK]</strong>, NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Cadastro comercial.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>telefone</code></td><td>Número de contato telefônico do fornecedor.</td><td>VARCHAR(20)</td><td>NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Cadastro comercial.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>ativo</code></td><td>Status do fornecedor (1=Ativo, 0=Inativo).</td><td>TINYINT(1)</td><td>NOT NULL, DEFAULT 1</td><td><span class="badge badge-na">[N/A]</span></td><td>Gestão comercial.</td><td>Gerente, Administrador</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- TABELA 5: produto -->
+                    <section id="produto" class="card mb-4 shadow-sm border-0 table-section">
+                        <div class="card-header bg-primary text-white fw-bold">Tabela: produto</div>
+                        <div class="card-body">
+                            <p class="text-muted">Catálogo central de acessórios, peças de reposição e componentes, gerenciando preços, estoques mínimos e ideais (RF05).</p>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Atributo</th>
+                                            <th>Descrição / Regra de Negócio</th>
+                                            <th>Tipo e Tamanho</th>
+                                            <th>Constraints</th>
+                                            <th>Privacidade</th>
+                                            <th>Linhagem</th>
+                                            <th>Acesso (RBAC)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><code>id_produto</code></td><td>Identificador único do produto.</td><td>INT</td><td><strong>[PK]</strong>, NOT NULL, AUTO_INCREMENT</td><td><span class="badge badge-na">[N/A]</span></td><td>Catálogo.</td><td>Gerente, Administrador (Leitura geral)</td></tr>
+                                        <tr><td><code>id_categoria</code></td><td>Categoria à qual o produto pertence.</td><td>INT</td><td><strong>[FK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>categoria</code>.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>id_fornecedor</code></td><td>Fornecedor principal do produto.</td><td>INT</td><td><strong>[FK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>fornecedor</code>.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>descricao</code></td><td>Descrição detalhada do produto ou peça.</td><td>VARCHAR(150)</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Catálogo.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>codigo_barras</code></td><td>Código de barras ou SKU do produto (RF05). Único quando preenchido.</td><td>VARCHAR(50)</td><td><strong>[UK]</strong>, NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Fabricante / Catálogo.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>preco_custo</code></td><td>Preço unitário de aquisição (custo). CHECK >= 0.</td><td>DECIMAL(12,2)</td><td>NOT NULL, CHECK (preco_custo >= 0)</td><td><span class="badge badge-na">[N/A]</span></td><td>Notas de compra.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>preco_venda</code></td><td>Preço unitário de comercialização/venda. CHECK > 0.</td><td>DECIMAL(12,2)</td><td>NOT NULL, CHECK (preco_venda > 0)</td><td><span class="badge badge-na">[N/A]</span></td><td>Definição gerencial.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>saldo_estoque</code></td><td>Quantidade física atual em estoque. Calculado por trigger via <code>mov_estoque</code> (RN07).</td><td>INT UNSIGNED</td><td>NOT NULL, DEFAULT 0, CHECK (saldo_estoque >= 0)</td><td><span class="badge badge-na">[N/A]</span></td><td>Movimentações de estoque.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>estoque_minimo</code></td><td>Limite mínimo de segurança para disparo da lista de compras do Brás (RN04).</td><td>INT UNSIGNED</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Planejamento de estoque.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>estoque_ideal</code></td><td>Quantidade ideal de estoque para reposição.</td><td>INT UNSIGNED</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Planejamento de estoque.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>ativo</code></td><td>Produto ativo para novas vendas/OS (1=Sim, 0=Inativo - RN01, RN11).</td><td>TINYINT(1)</td><td>NOT NULL, DEFAULT 1</td><td><span class="badge badge-na">[N/A]</span></td><td>Catálogo.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>data_cadastro</code></td><td>Data de cadastro do produto.</td><td>DATETIME</td><td>NOT NULL, DEFAULT CURRENT_TIMESTAMP</td><td><span class="badge badge-na">[N/A]</span></td><td>Automático SGBD.</td><td>Leitura geral</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- TABELA 6: endereco -->
+                    <section id="endereco" class="card mb-4 shadow-sm border-0 table-section">
+                        <div class="card-header bg-primary text-white fw-bold">Tabela: endereco</div>
+                        <div class="card-body">
+                            <p class="text-muted">Armazena os endereços postais associados aos clientes cadastrados.</p>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Atributo</th>
+                                            <th>Descrição / Regra de Negócio</th>
+                                            <th>Tipo e Tamanho</th>
+                                            <th>Constraints</th>
+                                            <th>Privacidade</th>
+                                            <th>Linhagem</th>
+                                            <th>Acesso (RBAC)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><code>id_endereco</code></td><td>Identificador único do endereço.</td><td>INT</td><td><strong>[PK]</strong>, NOT NULL, AUTO_INCREMENT</td><td><span class="badge badge-na">[N/A]</span></td><td>Cadastro de cliente.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>id_cliente</code></td><td>Cliente proprietário do endereço.</td><td>INT</td><td><strong>[FK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>cliente</code>.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>logradouro</code></td><td>Nome da rua, avenida ou logradouro.</td><td>VARCHAR(100)</td><td>NOT NULL</td><td><span class="badge badge-dp">[DP]</span></td><td>Informado pelo titular.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>numero</code></td><td>Número do imóvel ou endereço.</td><td>VARCHAR(10)</td><td>NOT NULL</td><td><span class="badge badge-dp">[DP]</span></td><td>Informado pelo titular.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>complemento</code></td><td>Complemento do endereço (bloco, apartamento, sala).</td><td>VARCHAR(50)</td><td>NULL</td><td><span class="badge badge-dp">[DP]</span></td><td>Informado pelo titular.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>bairro</code></td><td>Bairro do endereço.</td><td>VARCHAR(60)</td><td>NOT NULL</td><td><span class="badge badge-dp">[DP]</span></td><td>Informado pelo titular.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>cidade</code></td><td>Cidade do endereço.</td><td>VARCHAR(60)</td><td>NOT NULL</td><td><span class="badge badge-dp">[DP]</span></td><td>Informado pelo titular.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>uf</code></td><td>Sigla do Estado (UF).</td><td>CHAR(2)</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Informado pelo titular.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>cep</code></td><td>Código de Endereçamento Postal (CEP), 8 dígitos.</td><td>CHAR(8)</td><td>NOT NULL</td><td><span class="badge badge-dp">[DP]</span></td><td>Informado pelo titular.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- TABELA 7: consentimento_cliente -->
+                    <section id="consentimento_cliente" class="card mb-4 shadow-sm border-0 table-section">
+                        <div class="card-header bg-primary text-white fw-bold">Tabela: consentimento_cliente</div>
+                        <div class="card-body">
+                            <p class="text-muted">Registro comprobatório de consentimento exigido pela LGPD para contato via WhatsApp (PR03).</p>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Atributo</th>
+                                            <th>Descrição / Regra de Negócio</th>
+                                            <th>Tipo e Tamanho</th>
+                                            <th>Constraints</th>
+                                            <th>Privacidade</th>
+                                            <th>Linhagem</th>
+                                            <th>Acesso (RBAC)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><code>id_consentimento_cliente</code></td><td>Identificador único do registro de consentimento.</td><td>INT</td><td><strong>[PK]</strong>, NOT NULL, AUTO_INCREMENT</td><td><span class="badge badge-na">[N/A]</span></td><td>Módulo LGPD.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>id_cliente</code></td><td>Cliente que concedeu o consentimento.</td><td>INT</td><td><strong>[FK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>cliente</code>.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>finalidade</code></td><td>Finalidade do consentimento (WHATSAPP - PR03).</td><td>ENUM</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Termo de aceite.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>data_consentimento</code></td><td>Data e hora em que o consentimento foi aceito (RF01).</td><td>DATETIME</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Termo de aceite.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>data_revogacao</code></td><td>Data e hora da revogação (NULL indica consentimento ativo - RF04).</td><td>DATETIME</td><td>NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Solicitação do titular.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- TABELA 8: aparelho -->
+                    <section id="aparelho" class="card mb-4 shadow-sm border-0 table-section">
+                        <div class="card-header bg-primary text-white fw-bold">Tabela: aparelho</div>
+                        <div class="card-body">
+                            <p class="text-muted">Cadastro dos smartphones e aparelhos deixados pelos clientes para realização de Ordem de Serviço.</p>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Atributo</th>
+                                            <th>Descrição / Regra de Negócio</th>
+                                            <th>Tipo e Tamanho</th>
+                                            <th>Constraints</th>
+                                            <th>Privacidade</th>
+                                            <th>Linhagem</th>
+                                            <th>Acesso (RBAC)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><code>id_aparelho</code></td><td>Identificador único do aparelho.</td><td>INT</td><td><strong>[PK]</strong>, NOT NULL, AUTO_INCREMENT</td><td><span class="badge badge-na">[N/A]</span></td><td>Recepção OS.</td><td>Atendente, Técnico, Gerente, Administrador</td></tr>
+                                        <tr><td><code>id_cliente</code></td><td>Proprietário do aparelho (RN02, RN11).</td><td>INT</td><td><strong>[FK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>cliente</code>.</td><td>Atendente, Técnico, Gerente, Administrador</td></tr>
+                                        <tr><td><code>marca</code></td><td>Marca do aparelho (ex: Apple, Samsung, Xiaomi).</td><td>VARCHAR(50)</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Recepção OS.</td><td>Atendente, Técnico, Gerente, Administrador</td></tr>
+                                        <tr><td><code>modelo</code></td><td>Modelo comercial do aparelho.</td><td>VARCHAR(50)</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Recepção OS.</td><td>Atendente, Técnico, Gerente, Administrador</td></tr>
+                                        <tr><td><code>numero_serie</code></td><td>Número de série de fábrica. Limpo na anonimização.</td><td>VARCHAR(50)</td><td>NULL</td><td><span class="badge badge-dp">[DP]</span></td><td>Recepção OS.</td><td>Atendente, Técnico, Gerente, Administrador</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- TABELA 9: aparelho_imei -->
+                    <section id="aparelho_imei" class="card mb-4 shadow-sm border-0 table-section">
+                        <div class="card-header bg-primary text-white fw-bold">Tabela: aparelho_imei</div>
+                        <div class="card-body">
+                            <p class="text-muted">Armazena os códigos IMEI (slots 1 ou 2) associados aos aparelhos para conformidade de rastreabilidade (1FN).</p>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Atributo</th>
+                                            <th>Descrição / Regra de Negócio</th>
+                                            <th>Tipo e Tamanho</th>
+                                            <th>Constraints</th>
+                                            <th>Privacidade</th>
+                                            <th>Linhagem</th>
+                                            <th>Acesso (RBAC)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><code>id_aparelho_imei</code></td><td>Identificador único do registro de IMEI.</td><td>INT</td><td><strong>[PK]</strong>, NOT NULL, AUTO_INCREMENT</td><td><span class="badge badge-na">[N/A]</span></td><td>Recepção OS.</td><td>Atendente, Técnico, Gerente, Administrador</td></tr>
+                                        <tr><td><code>id_aparelho</code></td><td>Aparelho ao qual o IMEI pertence.</td><td>INT</td><td><strong>[FK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>aparelho</code>.</td><td>Atendente, Técnico, Gerente, Administrador</td></tr>
+                                        <tr><td><code>imei</code></td><td>Código IMEI de 15 dígitos. Único na base.</td><td>CHAR(15)</td><td><strong>[UK]</strong>, NOT NULL</td><td><span class="badge badge-dps">[DPS]</span></td><td>Leitura física do aparelho.</td><td>Atendente, Técnico, Gerente, Administrador</td></tr>
+                                        <tr><td><code>slot</code></td><td>Número do slot do chip (1 ou 2).</td><td>TINYINT</td><td>NOT NULL, CHECK (slot IN (1, 2))</td><td><span class="badge badge-na">[N/A]</span></td><td>Recepção OS.</td><td>Atendente, Técnico, Gerente, Administrador</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- TABELA 10: solicitacao_titular -->
+                    <section id="solicitacao_titular" class="card mb-4 shadow-sm border-0 table-section">
+                        <div class="card-header bg-primary text-white fw-bold">Tabela: solicitacao_titular</div>
+                        <div class="card-body">
+                            <p class="text-muted">Registro de solicitações de direitos dos titulares de dados (ACESSOS, CORREÇÕES, ANONIMIZAÇÃO - LGPD Art. 18).</p>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Atributo</th>
+                                            <th>Descrição / Regra de Negócio</th>
+                                            <th>Tipo e Tamanho</th>
+                                            <th>Constraints</th>
+                                            <th>Privacidade</th>
+                                            <th>Linhagem</th>
+                                            <th>Acesso (RBAC)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><code>id_solicitacao_titular</code></td><td>Identificador único da solicitação.</td><td>INT</td><td><strong>[PK]</strong>, NOT NULL, AUTO_INCREMENT</td><td><span class="badge badge-na">[N/A]</span></td><td>Módulo LGPD.</td><td>Gerente, Administrador (Criação: Atendente)</td></tr>
+                                        <tr><td><code>id_cliente</code></td><td>Cliente solicitante.</td><td>INT</td><td><strong>[FK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>cliente</code>.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>tipo</code></td><td>Tipo de solicitação (ACESSO, CORRECAO, ANONIMIZACAO, PORTABILIDADE).</td><td>ENUM</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Atendimento ao titular.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>data_solicitacao</code></td><td>Data e hora da abertura da solicitação.</td><td>DATETIME</td><td>NOT NULL, DEFAULT CURRENT_TIMESTAMP</td><td><span class="badge badge-na">[N/A]</span></td><td>Automático SGBD.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>data_atendimento</code></td><td>Data e hora do atendimento (prazo máx 15 dias - LGPD art. 19).</td><td>DATETIME</td><td>NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Atendimento concluído.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>id_usuario</code></td><td>Usuário responsável pelo registro/atendimento.</td><td>INT</td><td><strong>[FK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>usuario</code>.</td><td>Gerente, Administrador</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- TABELA 11: compra -->
+                    <section id="compra" class="card mb-4 shadow-sm border-0 table-section">
+                        <div class="card-header bg-primary text-white fw-bold">Tabela: compra</div>
+                        <div class="card-body">
+                            <p class="text-muted">Cabeçalho das compras presenciais de estoque realizadas nos fornecedores (Brás).</p>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Atributo</th>
+                                            <th>Descrição / Regra de Negócio</th>
+                                            <th>Tipo e Tamanho</th>
+                                            <th>Constraints</th>
+                                            <th>Privacidade</th>
+                                            <th>Linhagem</th>
+                                            <th>Acesso (RBAC)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><code>id_compra</code></td><td>Identificador único da compra.</td><td>INT</td><td><strong>[PK]</strong>, NOT NULL, AUTO_INCREMENT</td><td><span class="badge badge-na">[N/A]</span></td><td>Módulo de Compras.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>id_fornecedor</code></td><td>Fornecedor onde a compra foi realizada.</td><td>INT</td><td><strong>[FK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>fornecedor</code>.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>id_usuario</code></td><td>Usuário responsável pelo registro da compra (RN02).</td><td>INT</td><td><strong>[FK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>usuario</code>.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>data_hora</code></td><td>Instante exato do registro no sistema.</td><td>DATETIME</td><td>NOT NULL, DEFAULT CURRENT_TIMESTAMP</td><td><span class="badge badge-na">[N/A]</span></td><td>Automático SGBD.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>data_compra</code></td><td>Dia civil em que a compra ocorreu (RF13).</td><td>DATE</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Comprovante físico.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>numero_comprovante</code></td><td>Número do documento ou nota fiscal de compra (opcional).</td><td>VARCHAR(50)</td><td>NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Comprovante físico.</td><td>Gerente, Administrador</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- TABELA 12: item_compra -->
+                    <section id="item_compra" class="card mb-4 shadow-sm border-0 table-section">
+                        <div class="card-header bg-primary text-white fw-bold">Tabela: item_compra</div>
+                        <div class="card-body">
+                            <p class="text-muted">Itens detalhados de cada compra de estoque realizada. Imutável após gravado (RN10).</p>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Atributo</th>
+                                            <th>Descrição / Regra de Negócio</th>
+                                            <th>Tipo e Tamanho</th>
+                                            <th>Constraints</th>
+                                            <th>Privacidade</th>
+                                            <th>Linhagem</th>
+                                            <th>Acesso (RBAC)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><code>id_compra</code></td><td>Compra associada.</td><td>INT</td><td><strong>[PK]</strong>, <strong>[FK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>compra</code>.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>id_produto</code></td><td>Produto comprado.</td><td>INT</td><td><strong>[PK]</strong>, <strong>[FK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>produto</code>.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>quantidade</code></td><td>Quantidade adquirida do item.</td><td>INT UNSIGNED</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Módulo de Compras.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>preco_custo_unitario</code></td><td>Preço de custo unitário congelado no ato da compra.</td><td>DECIMAL(12,2)</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Módulo de Compras.</td><td>Gerente, Administrador</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- TABELA 13: caixa -->
+                    <section id="caixa" class="card mb-4 shadow-sm border-0 table-section">
+                        <div class="card-header bg-primary text-white fw-bold">Tabela: caixa</div>
+                        <div class="card-body">
+                            <p class="text-muted">Controle de turnos de caixa por operador, gerindo saldos iniciais, apurados e fechamentos (RN08).</p>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Atributo</th>
+                                            <th>Descrição / Regra de Negócio</th>
+                                            <th>Tipo e Tamanho</th>
+                                            <th>Constraints</th>
+                                            <th>Privacidade</th>
+                                            <th>Linhagem</th>
+                                            <th>Acesso (RBAC)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><code>id_caixa</code></td><td>Identificador único do turno de caixa.</td><td>INT</td><td><strong>[PK]</strong>, NOT NULL, AUTO_INCREMENT</td><td><span class="badge badge-na">[N/A]</span></td><td>Frente de Caixa.</td><td>Atendente (próprio), Gerente, Administrador</td></tr>
+                                        <tr><td><code>id_usuario</code></td><td>Operador responsável pelo caixa (RN02).</td><td>INT</td><td><strong>[FK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>usuario</code>.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>saldo_inicial</code></td><td>Valor monetário inicial na abertura do caixa (RF11). >= 0.</td><td>DECIMAL(12,2)</td><td>NOT NULL, CHECK (saldo_inicial >= 0)</td><td><span class="badge badge-na">[N/A]</span></td><td>Abertura de Caixa.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>valor_contado</code></td><td>Valor físico contado no fechamento pelo operador (RF08).</td><td>DECIMAL(12,2)</td><td>NULL, CHECK (valor_contado >= 0)</td><td><span class="badge badge-na">[N/A]</span></td><td>Fechamento de Caixa.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>saldo_apurado</code></td><td>Saldo calculado pelo sistema no fechamento.</td><td>DECIMAL(12,2)</td><td>NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Cálculo automático.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>data_abertura</code></td><td>Data e hora da abertura do caixa.</td><td>DATETIME</td><td>NOT NULL, DEFAULT CURRENT_TIMESTAMP</td><td><span class="badge badge-na">[N/A]</span></td><td>Automático SGBD.</td><td>Leitura geral</td></tr>
+                                        <tr><td><code>data_fechamento</code></td><td>Data e hora do encerramento do caixa.</td><td>DATETIME</td><td>NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Fechamento de Caixa.</td><td>Leitura geral</td></tr>
+                                        <tr><td><code>caixa_aberto_chave</code></td><td>Coluna gerada STORED para garantir regra de 1 único caixa aberto por operador (RN08).</td><td>INT</td><td>NULL, UNIQUE INDEX</td><td><span class="badge badge-na">[N/A]</span></td><td>Coluna Gerada SGBD.</td><td>Sistema (Backend)</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- TABELA 14: mov_caixa -->
+                    <section id="mov_caixa" class="card mb-4 shadow-sm border-0 table-section">
+                        <div class="card-header bg-primary text-white fw-bold">Tabela: mov_caixa</div>
+                        <div class="card-body">
+                            <p class="text-muted">Registro de suprimentos e sangrias de numerário realizados durante o turno de caixa.</p>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Atributo</th>
+                                            <th>Descrição / Regra de Negócio</th>
+                                            <th>Tipo e Tamanho</th>
+                                            <th>Constraints</th>
+                                            <th>Privacidade</th>
+                                            <th>Linhagem</th>
+                                            <th>Acesso (RBAC)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><code>id_mov_caixa</code></td><td>Identificador único da movimentação de caixa.</td><td>INT</td><td><strong>[PK]</strong>, NOT NULL, AUTO_INCREMENT</td><td><span class="badge badge-na">[N/A]</span></td><td>Frente de Caixa.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>id_caixa</code></td><td>Caixa onde ocorreu a movimentação.</td><td>INT</td><td><strong>[FK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>caixa</code>.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>tipo</code></td><td>Tipo de movimentação (SUPRIMENTO, SANGRIA).</td><td>ENUM</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Frente de Caixa.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>valor</code></td><td>Valor monetário envolvido. CHECK > 0. Imutável (RN10).</td><td>DECIMAL(12,2)</td><td>NOT NULL, CHECK (valor > 0)</td><td><span class="badge badge-na">[N/A]</span></td><td>Frente de Caixa.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>motivo</code></td><td>Justificativa obrigatória para a operação de caixa.</td><td>VARCHAR(255)</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Operador.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>data_hora</code></td><td>Instante da movimentação de caixa.</td><td>DATETIME</td><td>NOT NULL, DEFAULT CURRENT_TIMESTAMP</td><td><span class="badge badge-na">[N/A]</span></td><td>Automático SGBD.</td><td>Leitura geral</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- TABELA 15: venda -->
+                    <section id="venda" class="card mb-4 shadow-sm border-0 table-section">
+                        <div class="card-header bg-primary text-white fw-bold">Tabela: venda</div>
+                        <div class="card-body">
+                            <p class="text-muted">Cabeçalho das vendas diretas realizadas no balcão da loja.</p>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Atributo</th>
+                                            <th>Descrição / Regra de Negócio</th>
+                                            <th>Tipo e Tamanho</th>
+                                            <th>Constraints</th>
+                                            <th>Privacidade</th>
+                                            <th>Linhagem</th>
+                                            <th>Acesso (RBAC)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><code>id_venda</code></td><td>Identificador único da venda.</td><td>INT</td><td><strong>[PK]</strong>, NOT NULL, AUTO_INCREMENT</td><td><span class="badge badge-na">[N/A]</span></td><td>Frente de Caixa.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>id_cliente</code></td><td>Cliente adquirente (RN02, RN11).</td><td>INT</td><td><strong>[FK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>cliente</code>.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>id_caixa</code></td><td>Caixa operador da venda.</td><td>INT</td><td><strong>[FK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>caixa</code>.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>id_usuario</code></td><td>Usuário operador da venda.</td><td>INT</td><td><strong>[FK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>usuario</code>.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>status_venda</code></td><td>Status da venda (CONCLUIDA, ESTORNADA).</td><td>ENUM</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Frente de Caixa.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>data_hora</code></td><td>Instante da venda. Base para garantia de 90 dias (PR01).</td><td>DATETIME</td><td>NOT NULL, DEFAULT CURRENT_TIMESTAMP</td><td><span class="badge badge-na">[N/A]</span></td><td>Automático SGBD.</td><td>Leitura geral</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- TABELA 16: item_venda -->
+                    <section id="item_venda" class="card mb-4 shadow-sm border-0 table-section">
+                        <div class="card-header bg-primary text-white fw-bold">Tabela: item_venda</div>
+                        <div class="card-body">
+                            <p class="text-muted">Itens comercializados em cada venda de balcão, registrando preços congelados e descontos (RN05).</p>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Atributo</th>
+                                            <th>Descrição / Regra de Negócio</th>
+                                            <th>Tipo e Tamanho</th>
+                                            <th>Constraints</th>
+                                            <th>Privacidade</th>
+                                            <th>Linhagem</th>
+                                            <th>Acesso (RBAC)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><code>id_venda</code></td><td>Venda associada.</td><td>INT</td><td><strong>[PK]</strong>, <strong>[FK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>venda</code>.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>id_produto</code></td><td>Produto vendido.</td><td>INT</td><td><strong>[PK]</strong>, <strong>[FK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>produto</code>.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>quantidade</code></td><td>Quantidade do item na venda.</td><td>INT UNSIGNED</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Frente de Caixa.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>preco_unitario_venda</code></td><td>Preço unitário praticado na venda (congelado RN05). CHECK > 0.</td><td>DECIMAL(12,2)</td><td>NOT NULL, CHECK (preco_unitario_venda > 0)</td><td><span class="badge badge-na">[N/A]</span></td><td>Catálogo / Venda.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>preco_custo_unitario</code></td><td>Custo unitário congelado no ato da venda.</td><td>DECIMAL(12,2)</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>produto</code>.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>desconto_item</code></td><td>Desconto aplicado no item. CHECK >= 0. Imutável (RN10).</td><td>DECIMAL(12,2)</td><td>NOT NULL, DEFAULT 0, CHECK (desconto_item >= 0)</td><td><span class="badge badge-na">[N/A]</span></td><td>Negociação balcão.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- TABELA 17: ordem_servico -->
+                    <section id="ordem_servico" class="card mb-4 shadow-sm border-0 table-section">
+                        <div class="card-header bg-primary text-white fw-bold">Tabela: ordem_servico</div>
+                        <div class="card-body">
+                            <p class="text-muted">Cabeçalho das Ordens de Serviço (OS) de assistência técnica, controlando estados, aprovações e prazos de garantia.</p>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Atributo</th>
+                                            <th>Descrição / Regra de Negócio</th>
+                                            <th>Tipo e Tamanho</th>
+                                            <th>Constraints</th>
+                                            <th>Privacidade</th>
+                                            <th>Linhagem</th>
+                                            <th>Acesso (RBAC)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><code>id_ordem_servico</code></td><td>Identificador único da OS.</td><td>INT</td><td><strong>[PK]</strong>, NOT NULL, AUTO_INCREMENT</td><td><span class="badge badge-na">[N/A]</span></td><td>Bancada Técnica.</td><td>Atendente, Técnico, Gerente, Administrador</td></tr>
+                                        <tr><td><code>id_aparelho</code></td><td>Aparelho em manutenção (RN02).</td><td>INT</td><td><strong>[FK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>aparelho</code>.</td><td>Atendente, Técnico, Gerente, Administrador</td></tr>
+                                        <tr><td><code>id_usuario</code></td><td>Usuário operador de abertura da OS.</td><td>INT</td><td><strong>[FK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>usuario</code>.</td><td>Atendente, Técnico, Gerente, Administrador</td></tr>
+                                        <tr><td><code>id_usuario_tecnico</code></td><td>Técnico responsável pela execução do reparo.</td><td>INT</td><td><strong>[FK]</strong>, NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Bancada Técnica.</td><td>Atendente, Técnico, Gerente, Administrador</td></tr>
+                                        <tr><td><code>status_os</code></td><td>Status atual da OS (ABERTO, DIAGNOSTICO, AGUARDANDO_PECA, EM_REPARO, PRONTO, ENTREGUE, CANCELADO - RN03).</td><td>ENUM</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Bancada Técnica.</td><td>Atendente, Técnico, Gerente, Administrador</td></tr>
+                                        <tr><td><code>defeito_relatado</code></td><td>Relato do defeito apresentado pelo cliente. Anonimizado na anonimização do cliente.</td><td>TEXT</td><td>NOT NULL</td><td><span class="badge badge-dp">[DP]</span></td><td>Recepção OS.</td><td>Atendente, Técnico, Gerente, Administrador</td></tr>
+                                        <tr><td><code>estado_fisico_relatorio</code></td><td>Relatório detalhado do estado físico prévio do aparelho (PR04).</td><td>TEXT</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Recepção OS.</td><td>Atendente, Técnico, Gerente, Administrador</td></tr>
+                                        <tr><td><code>acessorio_deixado</code></td><td>Acessórios deixados junto com o aparelho (ex: capa, cartão SIM).</td><td>VARCHAR(255)</td><td>NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Recepção OS.</td><td>Atendente, Técnico, Gerente, Administrador</td></tr>
+                                        <tr><td><code>senha_desbloqueio</code></td><td>Senha de desbloqueio cifrada com AES-256. Descartada (NULL) após entrega (PR05).</td><td>VARBINARY(255)</td><td>NULL</td><td><span class="badge badge-dps">[DPS]</span></td><td>Recepção OS.</td><td>Técnico, Gerente, Administrador</td></tr>
+                                        <tr><td><code>observacao_tecnica</code></td><td>Observações e laudo técnico do reparo (RF03).</td><td>TEXT</td><td>NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Bancada Técnica.</td><td>Atendente, Técnico, Gerente, Administrador</td></tr>
+                                        <tr><td><code>valor_mao_obra</code></td><td>Valor da mão de obra cobrada na OS. CHECK >= 0.</td><td>DECIMAL(12,2)</td><td>NOT NULL, DEFAULT 0, CHECK (valor_mao_obra >= 0)</td><td><span class="badge badge-na">[N/A]</span></td><td>Orçamento.</td><td>Atendente, Técnico, Gerente, Administrador</td></tr>
+                                        <tr><td><code>aprovado_cliente</code></td><td>Indica se o orçamento foi aprovado pelo cliente (0=Não, 1=Sim - RN03, PR02).</td><td>TINYINT(1)</td><td>NOT NULL, DEFAULT 0</td><td><span class="badge badge-na">[N/A]</span></td><td>Aprovação do Cliente.</td><td>Atendente, Técnico, Gerente, Administrador</td></tr>
+                                        <tr><td><code>data_criacao</code></td><td>Data e hora de criação da OS.</td><td>DATETIME</td><td>NOT NULL, DEFAULT CURRENT_TIMESTAMP</td><td><span class="badge badge-na">[N/A]</span></td><td>Automático SGBD.</td><td>Leitura geral</td></tr>
+                                        <tr><td><code>data_orcamento</code></td><td>Data em que o orçamento foi gerado (validade de 10 dias - PR02).</td><td>DATETIME</td><td>NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Bancada Técnica.</td><td>Leitura geral</td></tr>
+                                        <tr><td><code>data_aprovacao</code></td><td>Data em que o orçamento foi aprovado.</td><td>DATETIME</td><td>NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Aprovação do Cliente.</td><td>Leitura geral</td></tr>
+                                        <tr><td><code>data_entrega</code></td><td>Data e hora da entrega do aparelho ao cliente (início da garantia PR01).</td><td>DATETIME</td><td>NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Entrega OS.</td><td>Leitura geral</td></tr>
+                                        <tr><td><code>data_fim_garantia</code></td><td>Data limite da garantia da OS (calculada por trigger: data_entrega + 90 dias).</td><td>DATE</td><td>NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Cálculo automático SGBD.</td><td>Leitura geral</td></tr>
+                                        <tr><td><code>data_cancelamento</code></td><td>Data e hora de cancelamento da OS (RF12, RN03).</td><td>DATETIME</td><td>NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Gestão OS.</td><td>Leitura geral</td></tr>
+                                        <tr><td><code>motivo_cancelamento</code></td><td>Motivo descritivo para o cancelamento da OS.</td><td>VARCHAR(255)</td><td>NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Gestão OS.</td><td>Leitura geral</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- TABELA 18: item_os -->
+                    <section id="item_os" class="card mb-4 shadow-sm border-0 table-section">
+                        <div class="card-header bg-primary text-white fw-bold">Tabela: item_os</div>
+                        <div class="card-body">
+                            <p class="text-muted">Peças e componentes aplicados em cada Ordem de Serviço, controlando estoque e tipos de peças (PR07).</p>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Atributo</th>
+                                            <th>Descrição / Regra de Negócio</th>
+                                            <th>Tipo e Tamanho</th>
+                                            <th>Constraints</th>
+                                            <th>Privacidade</th>
+                                            <th>Linhagem</th>
+                                            <th>Acesso (RBAC)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><code>id_ordem_servico</code></td><td>OS associada.</td><td>INT</td><td><strong>[PK]</strong>, <strong>[FK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>ordem_servico</code>.</td><td>Atendente, Técnico, Gerente, Administrador</td></tr>
+                                        <tr><td><code>id_produto</code></td><td>Peça ou produto aplicado.</td><td>INT</td><td><strong>[PK]</strong>, <strong>[FK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>produto</code>.</td><td>Atendente, Técnico, Gerente, Administrador</td></tr>
+                                        <tr><td><code>quantidade</code></td><td>Quantidade aplicada.</td><td>INT UNSIGNED</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Bancada Técnica.</td><td>Atendente, Técnico, Gerente, Administrador</td></tr>
+                                        <tr><td><code>preco_unitario_venda</code></td><td>Preço unitário de venda da peça (congelado RN05). CHECK > 0.</td><td>DECIMAL(12,2)</td><td>NOT NULL, CHECK (preco_unitario_venda > 0)</td><td><span class="badge badge-na">[N/A]</span></td><td>Catálogo.</td><td>Atendente, Técnico, Gerente, Administrador</td></tr>
+                                        <tr><td><code>preco_custo_unitario</code></td><td>Custo unitário congelado no ato da aplicação.</td><td>DECIMAL(12,2)</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>produto</code>.</td><td>Atendente, Técnico, Gerente, Administrador</td></tr>
+                                        <tr><td><code>aplicado</code></td><td>Indica se a peça já foi fisicamente aplicada ao aparelho (0=Não, 1=Sim - RN01).</td><td>TINYINT(1)</td><td>NOT NULL, DEFAULT 0</td><td><span class="badge badge-na">[N/A]</span></td><td>Bancada Técnica.</td><td>Atendente, Técnico, Gerente, Administrador</td></tr>
+                                        <tr><td><code>tipo_peca</code></td><td>Classificação da peça (NOVA_ORIGINAL, NOVA_EQUIVALENTE, USADA - PR07).</td><td>ENUM</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Bancada Técnica.</td><td>Atendente, Técnico, Gerente, Administrador</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- TABELA 19: mov_estoque -->
+                    <section id="mov_estoque" class="card mb-4 shadow-sm border-0 table-section">
+                        <div class="card-header bg-primary text-white fw-bold">Tabela: mov_estoque</div>
+                        <div class="card-body">
+                            <p class="text-muted">Trilha append-only de todas as movimentações de entrada e saída de estoque (compras, vendas, OS, ajustes - RN07).</p>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Atributo</th>
+                                            <th>Descrição / Regra de Negócio</th>
+                                            <th>Tipo e Tamanho</th>
+                                            <th>Constraints</th>
+                                            <th>Privacidade</th>
+                                            <th>Linhagem</th>
+                                            <th>Acesso (RBAC)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><code>id_mov_estoque</code></td><td>Identificador único da movimentação de estoque.</td><td>BIGINT</td><td><strong>[PK]</strong>, NOT NULL, AUTO_INCREMENT</td><td><span class="badge badge-na">[N/A]</span></td><td>Controle de Estoque.</td><td>Leitura geral (Gerente/Admin)</td></tr>
+                                        <tr><td><code>id_produto</code></td><td>Produto movimentado.</td><td>INT</td><td><strong>[FK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>produto</code>.</td><td>Leitura geral (Gerente/Admin)</td></tr>
+                                        <tr><td><code>id_usuario</code></td><td>Usuário responsável pela movimentação.</td><td>INT</td><td><strong>[FK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>usuario</code>.</td><td>Leitura geral (Gerente/Admin)</td></tr>
+                                        <tr><td><code>tipo_mov</code></td><td>Tipo da movimentação (ENTRADA_COMPRA, SAIDA_VENDA, SAIDA_OS, RETORNO_OS, ESTORNO_VENDA, ESTORNO_OS, AJUSTE_ENTRADA, AJUSTE_SAIDA).</td><td>ENUM</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Triggers de Sistema.</td><td>Leitura geral (Gerente/Admin)</td></tr>
+                                        <tr><td><code>quantidade</code></td><td>Quantidade movimentada.</td><td>INT UNSIGNED</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Transações.</td><td>Leitura geral (Gerente/Admin)</td></tr>
+                                        <tr><td><code>id_compra</code></td><td>Referência opcional à compra de origem (Arco exclusivo j).</td><td>INT</td><td><strong>[FK]</strong>, NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>compra</code>.</td><td>Leitura geral (Gerente/Admin)</td></tr>
+                                        <tr><td><code>id_venda</code></td><td>Referência opcional à venda de origem (Arco exclusivo j).</td><td>INT</td><td><strong>[FK]</strong>, NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>venda</code>.</td><td>Leitura geral (Gerente/Admin)</td></tr>
+                                        <tr><td><code>id_ordem_servico</code></td><td>Referência opcional à OS de origem (Arco exclusivo j).</td><td>INT</td><td><strong>[FK]</strong>, NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>ordem_servico</code>.</td><td>Leitura geral (Gerente/Admin)</td></tr>
+                                        <tr><td><code>motivo</code></td><td>Motivo descritivo (obrigatório em ajustes com min. 10 caracteres - RF15).</td><td>VARCHAR(255)</td><td>NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Operador.</td><td>Leitura geral (Gerente/Admin)</td></tr>
+                                        <tr><td><code>data_hora</code></td><td>Instante da movimentação. Imutável (RN10).</td><td>DATETIME</td><td>NOT NULL, DEFAULT CURRENT_TIMESTAMP</td><td><span class="badge badge-na">[N/A]</span></td><td>Automático SGBD.</td><td>Leitura geral (Gerente/Admin)</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- TABELA 20: pagamento -->
+                    <section id="pagamento" class="card mb-4 shadow-sm border-0 table-section">
+                        <div class="card-header bg-primary text-white fw-bold">Tabela: pagamento</div>
+                        <div class="card-body">
+                            <p class="text-muted">Registro de pagamentos efetuados para vendas ou ordens de serviço, vinculados ao caixa operador.</p>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Atributo</th>
+                                            <th>Descrição / Regra de Negócio</th>
+                                            <th>Tipo e Tamanho</th>
+                                            <th>Constraints</th>
+                                            <th>Privacidade</th>
+                                            <th>Linhagem</th>
+                                            <th>Acesso (RBAC)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><code>id_pagamento</code></td><td>Identificador único do pagamento.</td><td>INT</td><td><strong>[PK]</strong>, NOT NULL, AUTO_INCREMENT</td><td><span class="badge badge-na">[N/A]</span></td><td>Frente de Caixa.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>id_caixa</code></td><td>Caixa operador onde o pagamento foi recebido (RN08).</td><td>INT</td><td><strong>[FK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>caixa</code>.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>id_venda</code></td><td>Venda quitada (Arco exclusivo j). Opcional.</td><td>INT</td><td><strong>[FK]</strong>, NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>venda</code>.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>id_ordem_servico</code></td><td>OS quitada (Arco exclusivo j). Opcional.</td><td>INT</td><td><strong>[FK]</strong>, NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>ordem_servico</code>.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>forma_pagamento</code></td><td>Forma de pagamento (DINHEIRO, PIX, CARTAO_DEBITO, CARTAO_CREDITO).</td><td>ENUM</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Frente de Caixa.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>valor</code></td><td>Valor líquido recebido sem troco. CHECK > 0.</td><td>DECIMAL(12,2)</td><td>NOT NULL, CHECK (valor > 0)</td><td><span class="badge badge-na">[N/A]</span></td><td>Frente de Caixa.</td><td>Atendente, Gerente, Administrador</td></tr>
+                                        <tr><td><code>data_hora</code></td><td>Instante do pagamento. Imutável (RN10).</td><td>DATETIME</td><td>NOT NULL, DEFAULT CURRENT_TIMESTAMP</td><td><span class="badge badge-na">[N/A]</span></td><td>Automático SGBD.</td><td>Leitura geral</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- TABELA 21: estorno -->
+                    <section id="estorno" class="card mb-4 shadow-sm border-0 table-section">
+                        <div class="card-header bg-primary text-white fw-bold">Tabela: estorno</div>
+                        <div class="card-body">
+                            <p class="text-muted">Registro de estornos totais de vendas ou OS, autorizados exclusivamente por Gerentes ou Administradores (RN09).</p>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Atributo</th>
+                                            <th>Descrição / Regra de Negócio</th>
+                                            <th>Tipo e Tamanho</th>
+                                            <th>Constraints</th>
+                                            <th>Privacidade</th>
+                                            <th>Linhagem</th>
+                                            <th>Acesso (RBAC)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><code>id_estorno</code></td><td>Identificador único do estorno.</td><td>INT</td><td><strong>[PK]</strong>, NOT NULL, AUTO_INCREMENT</td><td><span class="badge badge-na">[N/A]</span></td><td>Gestão Financeira.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>id_venda</code></td><td>Venda estornada (Unique, Arco exclusivo j - RN09).</td><td>INT</td><td><strong>[FK]</strong>, <strong>[UK]</strong>, NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>venda</code>.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>id_ordem_servico</code></td><td>OS estornada (Unique, Arco exclusivo j - RN09).</td><td>INT</td><td><strong>[FK]</strong>, <strong>[UK]</strong>, NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>ordem_servico</code>.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>id_usuario</code></td><td>Usuário autorizador do estorno (Gerente ou Administrador).</td><td>INT</td><td><strong>[FK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>usuario</code>.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>id_caixa</code></td><td>Caixa operador vinculado ao estorno (RN08).</td><td>INT</td><td><strong>[FK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Tabela <code>caixa</code>.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>motivo</code></td><td>Motivo descritivo do estorno (mínimo de 10 caracteres - RN09).</td><td>VARCHAR(255)</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Gestor.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>forma_pagamento</code></td><td>Forma de devolução do valor.</td><td>ENUM</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Gestão Financeira.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>valor_devolvido</code></td><td>Valor monetário devolvido ao cliente. CHECK > 0.</td><td>DECIMAL(12,2)</td><td>NOT NULL, CHECK (valor_devolvido > 0)</td><td><span class="badge badge-na">[N/A]</span></td><td>Gestão Financeira.</td><td>Gerente, Administrador</td></tr>
+                                        <tr><td><code>data_hora</code></td><td>Instante do estorno. Imutável (RN10).</td><td>DATETIME</td><td>NOT NULL, DEFAULT CURRENT_TIMESTAMP</td><td><span class="badge badge-na">[N/A]</span></td><td>Automático SGBD.</td><td>Leitura geral</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- TABELA 22: log_auditoria -->
+                    <section id="log_auditoria" class="card mb-4 shadow-sm border-0 table-section">
+                        <div class="card-header bg-primary text-white fw-bold">Tabela: log_auditoria</div>
+                        <div class="card-body">
+                            <p class="text-muted">Trilha de auditoria append-only de todas as operações de INSERT e UPDATE em tabelas críticas (RNF01, SEG-08).</p>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Atributo</th>
+                                            <th>Descrição / Regra de Negócio</th>
+                                            <th>Tipo e Tamanho</th>
+                                            <th>Constraints</th>
+                                            <th>Privacidade</th>
+                                            <th>Linhagem</th>
+                                            <th>Acesso (RBAC)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><code>id_log_auditoria</code></td><td>Identificador único do log.</td><td>BIGINT</td><td><strong>[PK]</strong>, NOT NULL, AUTO_INCREMENT</td><td><span class="badge badge-na">[N/A]</span></td><td>Triggers de Auditoria.</td><td>Administrador</td></tr>
+                                        <tr><td><code>tabela_afetada</code></td><td>Nome da tabela que sofreu alteração.</td><td>VARCHAR(64)</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Triggers de Auditoria.</td><td>Administrador</td></tr>
+                                        <tr><td><code>operacao</code></td><td>Tipo de operação realizada (INSERT, UPDATE).</td><td>ENUM</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Triggers de Auditoria.</td><td>Administrador</td></tr>
+                                        <tr><td><code>chave_registro</code></td><td>Identificador chave do registro afetado (ex: id_ordem_servico=10).</td><td>VARCHAR(100)</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Triggers de Auditoria.</td><td>Administrador</td></tr>
+                                        <tr><td><code>valor_antigo</code></td><td>Estado anterior em formato JSON (dados pessoais anonimizados em hash SHA-256).</td><td>JSON</td><td>NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Triggers de Auditoria.</td><td>Administrador</td></tr>
+                                        <tr><td><code>valor_novo</code></td><td>Novo estado em formato JSON (dados pessoais anonimizados em hash SHA-256).</td><td>JSON</td><td>NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Triggers de Auditoria.</td><td>Administrador</td></tr>
+                                        <tr><td><code>id_usuario</code></td><td>Usuário responsável pela transação (E-AUD-001).</td><td>INT</td><td><strong>[FK]</strong>, NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>Conexão da aplicação.</td><td>Administrador</td></tr>
+                                        <tr><td><code>data_hora</code></td><td>Instante da operação auditada.</td><td>DATETIME</td><td>NOT NULL, DEFAULT CURRENT_TIMESTAMP</td><td><span class="badge badge-na">[N/A]</span></td><td>Automático SGBD.</td><td>Administrador</td></tr>
+                                        <tr><td><code>ip_origem</code></td><td>Endereço IP de origem da conexão.</td><td>VARCHAR(45)</td><td>NOT NULL</td><td><span class="badge badge-na">[N/A]</span></td><td>SGBD Session.</td><td>Administrador</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal do DER com Panzoom -->
+    <div class="modal fade" id="derModal" tabindex="-1" aria-labelledby="derModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="derModalLabel"><i class="fa-solid fa-network-wired me-2"></i>Diagrama Entidade-Relacionamento (DER)</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body bg-dark d-flex justify-content-center align-items-center overflow-hidden position-relative">
+                    <!-- Controles Zoom -->
+                    <div class="position-absolute top-0 end-0 p-3 z-3 d-flex gap-2">
+                        <button id="zoomIn" class="btn btn-light btn-sm fw-bold"><i class="fa-solid fa-plus"></i></button>
+                        <button id="zoomOut" class="btn btn-light btn-sm fw-bold"><i class="fa-solid fa-minus"></i></button>
+                        <button id="zoomReset" class="btn btn-light btn-sm fw-bold"><i class="fa-solid fa-rotate-right"></i> Reset</button>
+                    </div>
+                    <!-- Imagem do DER -->
+                    <div id="panzoom-container" class="w-100 h-100 d-flex justify-content-center align-items-center">
+                        <img src="assets/der.png" alt="Diagrama Entidade-Relacionamento" id="derImage" class="img-fluid" style="max-height: 85vh; cursor: grab;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS & Panzoom JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@panzoom/panzoom@4.5.1/dist/panzoom.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
